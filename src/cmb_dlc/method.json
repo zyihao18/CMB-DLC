@@ -1,0 +1,146 @@
+{
+  "version": "image_only_seven_v1",
+  "renderer_version": "cardinal_ras_evidence_v1",
+  "prompt_version": "image_only_assessment_v1",
+  "roles": [
+    {
+      "id": "op_core_confirmation",
+      "purpose": "Judge core CMB compatibility from detector heatmap, SWI morphology, and phase support.",
+      "focus": [
+        "compact round/ovoid hypointense SWI focus at the crosshair",
+        "detector heatmap centered on the same focal target",
+        "phase signal at the same point; weak phase can be possible rather than automatic rejection",
+        "reject off-target detections, line/branch shapes, sulcal shapes, and boundary-shaped structures",
+        "score the target itself, not nearby dark structures"
+      ],
+      "rows": [
+        "probability_heatmap",
+        "swi_crop",
+        "phase_crop"
+      ],
+      "crop_size": 80,
+      "slices": 5,
+      "weight": 0.25
+    },
+    {
+      "id": "op_phase_focality",
+      "purpose": "Judge whether phase evidence is focal and lesion-compatible.",
+      "focus": [
+        "phase response exactly at SWI dark dot",
+        "focal bright/compatible phase signal versus linear vessel phase signal",
+        "phase signal that follows a branch, sulcus, or tube",
+        "phase artifact/noise around the candidate"
+      ],
+      "rows": [
+        "swi_crop",
+        "phase_crop",
+        "probability_heatmap"
+      ],
+      "crop_size": 64,
+      "slices": 1,
+      "weight": 0.15
+    },
+    {
+      "id": "op_mip_focal_dot",
+      "purpose": "Check whether a compact SWI candidate remains a discrete focal dot on the corresponding mIP slab.",
+      "focus": [
+        "target remains a small isolated dark dot on mIP",
+        "no dark curvilinear vessel segment crosses the target on mIP",
+        "agreement between compact SWI dot, focal phase response, and focal mIP appearance",
+        "mIP blooming that is local rather than vessel-shaped"
+      ],
+      "rows": [
+        "probability_heatmap",
+        "swi_crop",
+        "phase_crop",
+        "mip_crop"
+      ],
+      "crop_size": 80,
+      "slices": 3,
+      "weight": 0.225
+    },
+    {
+      "id": "op_mip_vessel_guard",
+      "purpose": "Use mIP and displayed local columns to reject candidates explained by venous/tubular continuity.",
+      "focus": [
+        "dark vessel-like line or branch passing through the crosshair on mIP",
+        "alignment between mIP vessel course and SWI/phase hypointensity",
+        "candidate becoming elongated, connected, or tubular on mIP instead of remaining a dot",
+        "smooth vessel-like continuation or centroid drift within the displayed columns",
+        "support real lesion only if the target remains focal despite mIP vessel context"
+      ],
+      "rows": [
+        "mip_context",
+        "mip_crop",
+        "swi_crop",
+        "phase_crop"
+      ],
+      "crop_size": 128,
+      "slices": 7,
+      "weight": 0.125
+    },
+    {
+      "id": "op_boundary_guard",
+      "purpose": "Use mIP and full-slice context to reject sulcal, cortical-surface, skull-base, ventricular, or boundary mimics.",
+      "focus": [
+        "intraparenchymal dot versus cortical surface, sulcal, pial, skull-base, ventricular, or CSF boundary location",
+        "mIP dark vessel following sulcal or pial course through the candidate",
+        "local dot-like crop that is actually part of a boundary or surface structure on context rows",
+        "edge or skull-base artifacts that mimic compact SWI dots",
+        "score low when anatomic context explains the target as non-parenchymal"
+      ],
+      "rows": [
+        "mip_context",
+        "full_slice_context",
+        "mip_crop",
+        "swi_crop",
+        "phase_crop"
+      ],
+      "crop_size": 144,
+      "slices": 1,
+      "weight": 0.0875
+    },
+    {
+      "id": "op_cluster_vessel_map",
+      "purpose": "Judge whether nearby candidate peaks are separate lesions or repeated samples of the same vessel/artifact pattern.",
+      "focus": [
+        "nearby detector peaks around the target are hypotheses, not confirmed lesions",
+        "separate dot-like foci versus one continuous vessel/tree on mIP and SWI",
+        "local cluster shape and whether target should be split, merged, retained, or rejected",
+        "dense local cluster better explained by venous anatomy or repeated detector fragments",
+        "phase evidence for whether nearby foci are independent lesions or one linear structure"
+      ],
+      "rows": [
+        "mip_local_candidate_map",
+        "local_candidate_map",
+        "mip_crop",
+        "swi_crop",
+        "phase_crop"
+      ],
+      "crop_size": 144,
+      "slices": 9,
+      "weight": 0.0875
+    },
+    {
+      "id": "op_detector_distribution",
+      "purpose": "Judge detector-only patient/local distribution context as a weak prior without using GT-derived burden or patient pattern labels.",
+      "focus": [
+        "detector candidate burden visible in the displayed overlays only",
+        "nearby detector peaks that are separate focal dots versus one line/tree of vessel fragments",
+        "dense detector clusters that look like repeated artifacts or vessel samples",
+        "line-aligned or surface-aligned detector peaks suggesting vessel/artifact pattern",
+        "do not assume patient-level ground truth from distribution; use distribution only as weak context"
+      ],
+      "rows": [
+        "patient_candidate_projection",
+        "local_candidate_map",
+        "swi_context",
+        "phase_context"
+      ],
+      "crop_size": 180,
+      "slices": 7,
+      "weight": 0.075
+    }
+  ],
+  "cnn_weight": 0.2
+}

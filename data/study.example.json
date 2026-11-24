@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "modalities": {
+    "swi": "local/swi.nii.gz",
+    "phase": "local/phase.nii.gz",
+    "mip": "local/scanner_minip.nii.gz",
+    "magnitude": "local/magnitude.nii.gz"
+  }
+}

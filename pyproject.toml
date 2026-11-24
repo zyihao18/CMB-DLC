@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cmb-dlc"
+version = "0.1.0"
+description = "Research code for cerebral microbleed detection, localization, and counting"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "scipy>=1.10", "nibabel>=5", "Pillow>=10"]
+
+[project.optional-dependencies]
+detector = ["torch>=2.4"]
+registration = ["antspyx>=0.6.1"]
+
+[project.scripts]
+cmb-dlc = "cmb_dlc.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cmb_dlc = ["method.json"]
